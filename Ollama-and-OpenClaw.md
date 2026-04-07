@@ -1,4 +1,3 @@
-Markdown
 # Guide: Kết hợp Ollama và OpenClaw chạy ổn định 24/7
 
 Hướng dẫn cấu hình **Ollama** kết hợp với **OpenClaw** để chạy Local LLM ổn định, tối ưu hóa RAM và giữ model luôn trong trạng thái sẵn sàng (Keep-Alive).
@@ -21,25 +20,33 @@ Chạy lệnh sau để tạo thư mục cấu hình systemd (nếu chưa có) v
 ```bash
 sudo mkdir -p /etc/systemd/system/ollama.service.d
 sudo nano /etc/systemd/system/ollama.service.d/override.conf
-Bước 2: Thêm nội dung cấu hình
-Xóa trắng file (nếu có nội dung cũ) và dán nội dung sau vào.
-Lưu ý: Phải có dòng [Service] ở trên cùng để Systemd nhận diện đúng biến môi trường.
+```
 
-Ini, TOML
+### Bước 2: Thêm nội dung cấu hình
+Xóa trắng file (nếu có nội dung cũ) và dán nội dung sau vào. 
+**Lưu ý:** Phải có dòng `[Service]` ở trên cùng để Systemd nhận diện đúng biến môi trường.
+
+```ini
 [Service]
 Environment="OLLAMA_KEEP_ALIVE=-1"
-Bước 3: Áp dụng thay đổi
+```
+
+### Bước 3: Áp dụng thay đổi
 Cập nhật lại daemon và khởi động lại dịch vụ Ollama để các thiết lập có hiệu lực:
 
-Bash
+```bash
 sudo systemctl daemon-reload
 sudo systemctl restart ollama
-2. Cấu hình OpenClaw Config
-Cấu hình này được tối ưu cho model Gemma 4 (26b), thiết lập các công cụ mặc định và giới hạn một số quyền truy cập hệ thống để đảm bảo an toàn.
+```
 
-Chỉnh sửa file cấu hình tại: ~/.openclaw/config.json
+---
 
-JSON
+## 2. Cấu hình OpenClaw Config
+Cấu hình này được tối ưu cho model **Gemma 4 (26b)**, thiết lập các công cụ mặc định và giới hạn một số quyền truy cập hệ thống để đảm bảo an toàn.
+
+Chỉnh sửa file cấu hình tại: `~/.openclaw/config.json`
+
+```json
 {
   "agents": {
     "defaults": {
@@ -94,7 +101,7 @@ JSON
     "mode": "merge",
     "providers": {
       "ollama": {
-        "baseUrl": "[http://127.0.0.1:11434](http://127.0.0.1:11434)",
+        "baseUrl": "http://127.0.0.1:11434",
         "api": "ollama",
         "models": [
           {
@@ -108,16 +115,23 @@ JSON
     }
   }
 }
-3. Kiểm tra và Xác minh
-Kiểm tra biến môi trường Ollama
+```
+
+---
+
+## 3. Kiểm tra và Xác minh
+
+### Kiểm tra biến môi trường Ollama
 Chạy lệnh sau để xác nhận cấu hình Keep-Alive đã được hệ thống ghi nhận:
 
-Bash
+```bash
 systemctl show ollama.service | grep "Environment"
-Kết quả chuẩn: Phải xuất hiện chuỗi OLLAMA_KEEP_ALIVE=-1.
+```
+**Kết quả chuẩn:** Phải xuất hiện chuỗi `OLLAMA_KEEP_ALIVE=-1`.
 
-Kiểm tra kết nối Gateway
+### Kiểm tra kết nối Gateway
 Mở trình duyệt và truy cập vào cổng cấu hình của OpenClaw để bắt đầu sử dụng:
-http://127.0.0.1:18789
+`http://127.0.0.1:18789`
 
-Chúc bro setup thành công!
+---
+*Chúc bro setup thành công!*
